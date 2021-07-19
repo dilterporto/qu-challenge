@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 
 namespace WordFinder.ConsoleApp
 {
     public class Matrix
     {
-        private const int MAX_SIZE = 64;
         private StringBuilder _charMatrix;
         private int _size;
+        private readonly IConfiguration _configuration;
 
-        private Matrix(IList<string> input)
+        public Matrix(IList<string> input, IConfiguration configuration)
         {
+            _configuration = configuration;
+            
             this.CheckIfIsSquare(input);
             this.CheckSizeLimit();
             this.IndexContent(input);
@@ -35,28 +38,28 @@ namespace WordFinder.ConsoleApp
 
         private void CheckSizeLimit()
         {
-            if (_size > MAX_SIZE)
-                throw new Exception("size limit exceeded");
+            var maxSize = int.Parse(_configuration[Constants.MatrixSettings.MaxSize]);
+            if (_size > maxSize)
+                throw new Exception(_configuration[Constants.Messages.SizeLimitExceeded]);
         }
         
         private void CheckIfIsSquare(IList<string> input)
         {
-            const string message = "invalid matrix input";
             try
             {
                 var columnSize = Enumerable.Range(0, input.Count)
                     .Select(index => input[index].Length)
                     .Distinct()
                     .Single();
-                
+
                 if (columnSize != input.Count)
-                    throw new Exception(message);
+                    throw new Exception(_configuration[Constants.Messages.InvalidMatrix]);
 
                 _size = columnSize;
             }
             catch
             {
-                throw new Exception(message);
+                throw new Exception(_configuration[Constants.Messages.InvalidMatrix]);
             }
         }
 
@@ -65,9 +68,10 @@ namespace WordFinder.ConsoleApp
             return Regex.Matches(_charMatrix.ToString(), term).Count;
         }
         
-        public static implicit operator Matrix(List<string> input)
+        public static implicit operator Matrix((List<string> input, IConfiguration configuration) init)
         {
-            return new(input);
+            var (input, configuration) = init;
+            return new Matrix(input, configuration);
         }
     }
 }

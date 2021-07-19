@@ -1,17 +1,22 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 
 namespace WordFinder.ConsoleApp
 {
-    public class WordFinder
+    public interface IWordFinder
+    {
+        IEnumerable<string> Find(IEnumerable<string> wordStream);
+    }
+
+    public class WordFinder : IWordFinder
     {
         private readonly Matrix _matrix;
         private readonly Dictionary<string, int> _wordRank = new();
         
-        public WordFinder(IEnumerable<string> matrix)
+        public WordFinder(IEnumerable<string> matrix, IConfiguration configuration)
         {
-            _matrix = matrix.ToList();
+            _matrix = (matrix.ToList(), configuration);
         }
 
         public IEnumerable<string> Find(IEnumerable<string> wordStream)
