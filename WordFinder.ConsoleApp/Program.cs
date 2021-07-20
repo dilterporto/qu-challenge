@@ -11,8 +11,7 @@ namespace WordFinder.ConsoleApp
             try
             {
                 var stopWatch = new Stopwatch();
-                stopWatch.Start();
-                
+                                
                 IWordFinder finder = new WordFinder(Inputs.Matrix, new MemoryConfiguration());
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("> Given the following matrix:");
@@ -26,10 +25,13 @@ namespace WordFinder.ConsoleApp
                 Console.BackgroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(string.Join(", ", wordStream));
                 
+                stopWatch.Start();
+        
                 var words = finder
                     .Find(wordStream);
                 
                 stopWatch.Stop();
+        
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.WriteLine();
                 Console.Write($"> Results found (sorted by relevance): ");
